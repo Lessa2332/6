@@ -19,7 +19,7 @@
       height: 100%;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      touch-action: manipulation; /* дозволяє кліки */
+      touch-action: manipulation;
       background: #000;
     }
 
@@ -56,111 +56,32 @@
       z-index: 100;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-
-    #smartLessaBtn:hover {
-      background: #003087;
-    }
   </style>
 </head>
 <body>
-  <div id="scanText">Наведи камеру на маркер Hiro</div>
+  <div id="scanText">Натисни, щоб увімкнути камеру</div>
 
   <a-scene
     embedded
-    arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+    arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false; canvasResolution: 0.5;"
     renderer="colorFormat: rgba; clearAlpha: 0;"
     vr-mode-ui="enabled: false"
+    id="arScene"
   >
     <a-marker preset="hiro" id="marker">
       <a-entity id="quiz-container" position="0 0 0" rotation="-90 0 0" scale="0.12 0.12 0.12">
-        <!-- Підказка -->
         <a-text
           id="hint-text"
-          value=""
+          value="Чекаємо на маркер..."
           font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
           width="30"
           wrapCount="20"
           align="center"
           color="#FFD700"
           position="0 3.5 0"
-          side="double"
         ></a-text>
-
-        <!-- Варіанти відповідей -->
-        <a-entity id="optionA" class="option" position="-1.5 1 0">
-          <a-plane width="3" height="0.8" color="#0055A4" opacity="0.8"></a-plane>
-          <a-text
-            class="option-label"
-            value=""
-            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            width="20"
-            wrapCount="18"
-            align="center"
-            color="white"
-            position="0 -0.3 0.01"
-            side="double"
-          ></a-text>
-        </a-entity>
-
-        <a-entity id="optionB" class="option" position="0 1 0">
-          <a-plane width="3" height="0.8" color="#0055A4" opacity="0.8"></a-plane>
-          <a-text
-            class="option-label"
-            value=""
-            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            width="20"
-            wrapCount="18"
-            align="center"
-            color="white"
-            position="0 -0.3 0.01"
-            side="double"
-          ></a-text>
-        </a-entity>
-
-        <a-entity id="optionC" class="option" position="1.5 1 0">
-          <a-plane width="3" height="0.8" color="#0055A4" opacity="0.8"></a-plane>
-          <a-text
-            class="option-label"
-            value=""
-            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            width="20"
-            wrapCount="18"
-            align="center"
-            color="white"
-            position="0 -0.3 0.01"
-            side="double"
-          ></a-text>
-        </a-entity>
-
-        <!-- Результат -->
-        <a-entity id="result-container" visible="false">
-          <a-text
-            id="result-text"
-            value=""
-            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            width="30"
-            wrapCount="22"
-            align="center"
-            color="#FFD700"
-            position="0 2 0"
-            side="double"
-          ></a-text>
-          <a-entity id="restart-btn" position="0 0.5 0">
-            <a-plane width="2.5" height="0.8" color="#FFD700" opacity="0.8"></a-plane>
-            <a-text
-              value="Розпочати знову"
-              font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-              width="20"
-              align="center"
-              color="black"
-              position="0 -0.3 0.01"
-              side="double"
-            ></a-text>
-          </a-entity>
-        </a-entity>
       </a-entity>
     </a-marker>
-
     <a-entity camera></a-entity>
   </a-scene>
 
@@ -168,101 +89,31 @@
      id="smartLessaBtn" target="_blank">@SmartLessa</a>
 
   <script>
-    const marker = document.getElementById('marker');
     const scanText = document.getElementById('scanText');
-    const hintText = document.getElementById('hint-text');
-    const optionA = document.getElementById('optionA');
-    const optionB = document.getElementById('optionB');
-    const optionC = document.getElementById('optionC');
-    const resultContainer = document.getElementById('result-container');
-    const resultText = document.getElementById('result-text');
-    const restartBtn = document.getElementById('restart-btn');
+    const arScene = document.querySelector('a-scene');
 
-    // Символи України
-    const symbols = [
-      { name: "Вишиванка", hint: "Традиційний український одяг із яскравими візерунками." },
-      { name: "Калина", hint: "Рослина з червоними ягодами, символ краси та любові." },
-      { name: "Писанка", hint: "Розписане яйце, яке дарують на Великдень." },
-      { name: "Тризуб", hint: "Державний символ України — тризуб." },
-      { name: "Бандура", hint: "Музичний інструмент, який грає кобзар." },
-      { name: "Рушник", hint: "Вишиваний шматок тканини для свят." },
-      { name: "Кобзар", hint: "Музикант, який співає думи під бандуру." },
-      { name: "Козацька шабля", hint: "Зброя козаків для захисту Вітчизни." }
-    ];
+    // 🔥 Головне: дозволити камеру тільки після кліку користувача
+    function startAR() {
+      scanText.textContent = 'Завантаження AR...';
 
-    let currentRound = 0;
-    let score = 0;
-    let currentSymbols = [];
-    const totalRounds = 5;
+      // AR.js автоматично використовує getUserMedia
+      // Але ми чекаємо на дозвіл через клік
 
-    function shuffle(array) {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
+      setTimeout(() => {
+        scanText.textContent = 'Наведи на маркер Hiro';
+      }, 1000);
     }
 
-    function startGame() {
-      currentRound = 0;
-      score = 0;
-      resultContainer.setAttribute('visible', false);
-      currentSymbols = shuffle(symbols).slice(0, totalRounds);
-      showHint();
-    }
-
-    function showHint() {
-      if (currentRound < totalRounds) {
-        const s = currentSymbols[currentRound];
-        hintText.setAttribute('value', s.hint);
-
-        const options = [{ name: s.name, correct: true }];
-        const wrongs = shuffle(symbols.filter(sym => sym.name !== s.name)).slice(0, 2);
-        wrongs.forEach(w => options.push({ name: w.name, correct: false }));
-
-        const shuffled = shuffle(options);
-
-        [optionA, optionB, optionC].forEach((opt, i) => {
-          opt.querySelector('.option-label').setAttribute('value', shuffled[i].name);
-          opt.dataset.correct = shuffled[i].correct;
-        });
-      } else {
-        showResult();
-      }
-    }
-
-    function handleAnswer(option) {
-      if (option.dataset.correct === 'true') score++;
-      currentRound++;
-      setTimeout(showHint, 500);
-    }
-
-    function showResult() {
-      hintText.setAttribute('value', '');
-      [optionA, optionB, optionC].forEach(opt => {
-        opt.querySelector('.option-label').setAttribute('value', '');
-      });
-
-      const stars = score === 5 ? '🌟🌟🌟' : score >= 3 ? '🌟🌟' : '🌟';
-      resultText.setAttribute('value', `Ти правильно відповів на ${score} з ${totalRounds} питань!\n${stars}`);
-      resultContainer.setAttribute('visible', true);
-    }
-
-    // Обробники
-    [optionA, optionB, optionC].forEach(opt => {
-      opt.addEventListener('click', () => handleAnswer(opt));
-    });
-    restartBtn.addEventListener('click', startGame);
-
-    // Події маркера
-    marker.addEventListener('markerFound', () => {
+    // 🔴 Камера запускається ТІЛЬКИ після кліку
+    scanText.addEventListener('click', function() {
       scanText.style.display = 'none';
-      startGame();
+      startAR();
     });
 
-    marker.addEventListener('markerLost', () => {
-      scanText.style.display = 'block';
+    // Коли маркер знайдено
+    document.getElementById('marker').addEventListener('markerFound', () => {
+      console.log('Маркер знайдено!');
+      document.getElementById('hint-text').setAttribute('value', 'Вітаємо! Гра почалася!');
     });
 
     // Фікс висоти
@@ -271,13 +122,7 @@
     }
     window.addEventListener('resize', setHeight);
     setHeight();
-
-    // Перевірка камери
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .catch(err => {
-        scanText.textContent = 'Дозвольте доступ до камери';
-        console.error('Помилка камери:', err);
-      });
   </script>
 </body>
 </html>
+
