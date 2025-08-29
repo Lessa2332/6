@@ -2,10 +2,15 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AR Гра: Символи України</title>
+
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+
+  <!-- AR.js (стабільна версія) -->
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.5/aframe/build/aframe-ar.js"></script>
+
   <style>
     html, body {
       margin: 0;
@@ -13,78 +18,142 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      touch-action: none; /* блокує pinch zoom */
       font-family: Arial, sans-serif;
+      touch-action: manipulation; /* дозволяє кліки, але блокує zoom */
+      background: #000;
     }
-    a-scene {
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
+
     #scanText {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       color: #FFD700;
-      font-size: 2em;
+      font-size: 1.8em;
       font-weight: bold;
-      text-shadow: 2px 2px 6px #000;
-      z-index: 10;
+      text-shadow: 2px 2px 8px #000;
+      z-index: 100;
       text-align: center;
       width: 90%;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 16px;
     }
+
     #smartLessaBtn {
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: #0055A4; /* Синій колір прапора */
-      color: #FFD700; /* Жовтий колір прапора */
+      background: #0055A4;
+      color: #FFD700;
       padding: 14px 24px;
       border-radius: 30px;
       font-size: 1.1em;
       font-weight: bold;
       text-decoration: none;
-      z-index: 10;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
+
     #smartLessaBtn:hover {
-      background: #003087; /* Темніший синій */
+      background: #003087;
     }
   </style>
 </head>
 <body>
-  <div id="scanText">Наведи камеру на зображення Hiro маркера</div>
+  <div id="scanText">Наведи камеру на маркер Hiro</div>
 
-  <a-scene embedded id="arScene" arjs="sourceType: webcam; detectionMode: mono; trackingMethod: best; facingBack: true; debugUIEnabled: false;">
-    <a-marker id="marker" preset="hiro">
-      <!-- Контейнер для гри -->
-      <a-entity id="quiz-container" position="0 0 0" rotation="-90 0 0" scale="0.15 0.15 0.15">
-        <a-text id="hint-text" value="" position="0 4 0" width="25" align="center" color="white" material="shader: standard; color: white; emissive: #000000; emissiveIntensity: 0.2"></a-text>
+  <a-scene
+    embedded
+    arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+    renderer="colorFormat: rgba; clearAlpha: 0;"
+    vr-mode-ui="enabled: false"
+  >
+    <a-marker preset="hiro" id="marker">
+      <a-entity id="quiz-container" position="0 0 0" rotation="-90 0 0" scale="0.12 0.12 0.12">
+        <!-- Підказка -->
+        <a-text
+          id="hint-text"
+          value=""
+          width="30"
+          wrapCount="20"
+          align="center"
+          color="#FFD700"
+          position="0 3.5 0"
+          font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+        ></a-text>
+
+        <!-- Варіанти -->
         <a-entity id="optionA" class="option" position="0 2 0">
-          <a-plane width="4" height="1" material="color: #0055A4; opacity: 0.7"></a-plane>
-          <a-text value="" width="22" align="center" color="white" position="0 -0.4 0.01" material="shader: standard; color: white; emissive: #000000; emissiveIntensity: 0.2"></a-text>
+          <a-plane width="4" height="1" color="#0055A4" opacity="0.8"></a-plane>
+          <a-text
+            class="option-label"
+            value=""
+            width="28"
+            wrapCount="18"
+            align="center"
+            color="white"
+            position="0 -0.3 0.01"
+            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+          ></a-text>
         </a-entity>
+
         <a-entity id="optionB" class="option" position="0 0.5 0">
-          <a-plane width="4" height="1" material="color: #0055A4; opacity: 0.7"></a-plane>
-          <a-text value="" width="22" align="center" color="white" position="0 -0.4 0.01" material="shader: standard; color: white; emissive: #000000; emissiveIntensity: 0.2"></a-text>
+          <a-plane width="4" height="1" color="#0055A4" opacity="0.8"></a-plane>
+          <a-text
+            class="option-label"
+            value=""
+            width="28"
+            wrapCount="18"
+            align="center"
+            color="white"
+            position="0 -0.3 0.01"
+            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+          ></a-text>
         </a-entity>
+
         <a-entity id="optionC" class="option" position="0 -1 0">
-          <a-plane width="4" height="1" material="color: #0055A4; opacity: 0.7"></a-plane>
-          <a-text value="" width="22" align="center" color="white" position="0 -0.4 0.01" material="shader: standard; color: white; emissive: #000000; emissiveIntensity: 0.2"></a-text>
+          <a-plane width="4" height="1" color="#0055A4" opacity="0.8"></a-plane>
+          <a-text
+            class="option-label"
+            value=""
+            width="28"
+            wrapCount="18"
+            align="center"
+            color="white"
+            position="0 -0.3 0.01"
+            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+          ></a-text>
         </a-entity>
+
+        <!-- Результат -->
         <a-entity id="result-container" visible="false">
-          <a-text id="result-text" value="" position="0 2 0" width="25" align="center" color="#FFD700" material="shader: standard; color: #FFD700; emissive: #000000; emissiveIntensity: 0.2"></a-text>
-          <a-entity id="restart-btn" class="clickable" position="0 0 0">
-            <a-plane width="3" height="1" material="color: #FFD700; opacity: 0.7"></a-plane>
-            <a-text value="Розпочати знову" width="15" align="center" color="white" position="0 -0.4 0.01" material="shader: standard; color: white; emissive: #000000; emissiveIntensity: 0.2"></a-text>
+          <a-text
+            id="result-text"
+            value=""
+            width="30"
+            wrapCount="22"
+            align="center"
+            color="#FFD700"
+            position="0 2 0"
+            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+          ></a-text>
+          <a-entity id="restart-btn" position="0 0.5 0">
+            <a-plane width="3" height="1" color="#FFD700" opacity="0.8"></a-plane>
+            <a-text
+              value="Розпочати знову"
+              width="20"
+              align="center"
+              color="black"
+              position="0 -0.3 0.01"
+              font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            ></a-text>
           </a-entity>
         </a-entity>
       </a-entity>
     </a-marker>
+
     <a-entity camera></a-entity>
   </a-scene>
 
@@ -94,7 +163,6 @@
   <script>
     const marker = document.getElementById('marker');
     const scanText = document.getElementById('scanText');
-    const quizContainer = document.getElementById('quiz-container');
     const hintText = document.getElementById('hint-text');
     const optionA = document.getElementById('optionA');
     const optionB = document.getElementById('optionB');
@@ -103,40 +171,15 @@
     const resultText = document.getElementById('result-text');
     const restartBtn = document.getElementById('restart-btn');
 
-    // Символи України та підказки
     const symbols = [
-      {
-        name: "Вишиванка",
-        hint: "Це традиційний український одяг із яскравими візерунками."
-      },
-      {
-        name: "Калина",
-        hint: "Ця рослина з червоними ягодами символізує красу і любов."
-      },
-      {
-        name: "Писанка",
-        hint: "Це розписане яйце, яке дарують на Великдень."
-      },
-      {
-        name: "Тризуб",
-        hint: "Це державний символ України, схожий на тризубець."
-      },
-      {
-        name: "Бандура",
-        hint: "Цей музичний інструмент використовують кобзарі."
-      },
-      {
-        name: "Рушник",
-        hint: "Вишиваний шматок тканини, який використовують на святах."
-      },
-      {
-        name: "Кобзар",
-        hint: "Це музикант, який співає думи під акомпанемент бандури."
-      },
-      {
-        name: "Козацька шабля",
-        hint: "Зброя, яку використовували козаки для захисту."
-      }
+      { name: "Вишиванка", hint: "Традиційний український одяг із яскравими візерунками." },
+      { name: "Калина", hint: "Рослина з червоними ягодами, символ краси та любові." },
+      { name: "Писанка", hint: "Розписане яйце, яке дарують на Великдень." },
+      { name: "Тризуб", hint: "Державний символ України — тризуб." },
+      { name: "Бандура", hint: "Музичний інструмент, який грає кобзар." },
+      { name: "Рушник", hint: "Вишиваний шматок тканини для свят." },
+      { name: "Кобзар", hint: "Музикант, який співає думи під бандуру." },
+      { name: "Козацька шабля", hint: "Зброя козаків для захисту Вітчизни." }
     ];
 
     let currentRound = 0;
@@ -144,21 +187,20 @@
     let currentSymbols = [];
     const totalRounds = 5;
 
-    // Функція для перемішування масиву
     function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
-      return array;
+      return arr;
     }
 
     function startGame() {
       currentRound = 0;
       score = 0;
       resultContainer.setAttribute('visible', false);
-      // Вибираємо 5 випадкових символів для гри
-      currentSymbols = shuffle([...symbols]).slice(0, totalRounds);
+      currentSymbols = shuffle(symbols).slice(0, totalRounds);
       showHint();
     }
 
@@ -166,48 +208,43 @@
       if (currentRound < totalRounds) {
         const s = currentSymbols[currentRound];
         hintText.setAttribute('value', s.hint);
-        // Вибираємо 3 випадкові варіанти відповідей, включаючи правильну
+
         const options = [{ name: s.name, correct: true }];
-        const otherSymbols = symbols.filter(sym => sym.name !== s.name);
-        const wrongOptions = shuffle([...otherSymbols]).slice(0, 2).map(sym => ({ name: sym.name, correct: false }));
-        const allOptions = shuffle([...options, ...wrongOptions]);
-        optionA.querySelector('a-text').setAttribute('value', allOptions[0].name);
-        optionB.querySelector('a-text').setAttribute('value', allOptions[1].name);
-        optionC.querySelector('a-text').setAttribute('value', allOptions[2].name);
-        // Зберігаємо правильну відповідь для перевірки
-        optionA.correct = allOptions[0].correct;
-        optionB.correct = allOptions[1].correct;
-        optionC.correct = allOptions[2].correct;
+        const wrongs = shuffle(symbols.filter(sym => sym.name !== s.name)).slice(0, 2);
+        wrongs.forEach(w => options.push({ name: w.name, correct: false }));
+
+        const shuffled = shuffle(options);
+
+        [optionA, optionB, optionC].forEach((opt, i) => {
+          opt.querySelector('.option-label').setAttribute('value', shuffled[i].name);
+          opt.dataset.correct = shuffled[i].correct;
+        });
       } else {
         showResult();
       }
     }
 
-    function handleAnswer(selectedOption) {
-      if (selectedOption.correct) {
-        score++;
-      }
+    function handleAnswer(option) {
+      if (option.dataset.correct === 'true') score++;
       currentRound++;
-      showHint();
+      setTimeout(showHint, 500);
     }
 
     function showResult() {
       hintText.setAttribute('value', '');
-      optionA.querySelector('a-text').setAttribute('value', '');
-      optionB.querySelector('a-text').setAttribute('value', '');
-      optionC.querySelector('a-text').setAttribute('value', '');
-      let badge = '';
-      if (score === 5) badge = 'Супер знавець символів! 🌟🌟🌟';
-      else if (score >= 3) badge = 'Молодець, знаєш символи! 🌟🌟';
-      else badge = 'Ти дізнався про символи! 🌟';
-      resultText.setAttribute('value', `Ти правильно відповів на ${score} з ${totalRounds} питань!\n${badge}`);
+      [optionA, optionB, optionC].forEach(opt => {
+        opt.querySelector('.option-label').setAttribute('value', '');
+      });
+
+      const stars = score === 5 ? '🌟🌟🌟' : score >= 3 ? '🌟🌟' : '🌟';
+      resultText.setAttribute('value', `Ти відповів на ${score} з ${totalRounds} питань!\n${stars}`);
       resultContainer.setAttribute('visible', true);
     }
 
-    // Додаємо обробники кліків
-    optionA.addEventListener('click', () => handleAnswer(optionA));
-    optionB.addEventListener('click', () => handleAnswer(optionB));
-    optionC.addEventListener('click', () => handleAnswer(optionC));
+    // Обробники
+    [optionA, optionB, optionC].forEach(opt => {
+      opt.addEventListener('click', () => handleAnswer(opt));
+    });
     restartBtn.addEventListener('click', startGame);
 
     // Події маркера
@@ -218,31 +255,19 @@
 
     marker.addEventListener('markerLost', () => {
       scanText.style.display = 'block';
-      // Скидаємо гру, щоб уникнути застрягання
-      resultContainer.setAttribute('visible', false);
-      hintText.setAttribute('value', '');
-      optionA.querySelector('a-text').setAttribute('value', '');
-      optionB.querySelector('a-text').setAttribute('value', '');
-      optionC.querySelector('a-text').setAttribute('value', '');
     });
 
-    // Перевірка доступу до камери
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        console.log('Доступ до задньої камери надано');
-      })
-      .catch(err => {
-        scanText.textContent = 'Дозвольте доступ до задньої камери для AR';
-        console.error('Помилка доступу до камери:', err);
-      });
+    // Фікс висоти
+    const setHeight = () => document.body.style.height = window.innerHeight + 'px';
+    window.addEventListener('resize', setHeight);
+    setHeight();
 
-    // Фікс висоти для мобільних браузерів
-    function fixHeight() {
-      document.body.style.height = window.innerHeight + 'px';
-    }
-    window.addEventListener('resize', fixHeight);
-    fixHeight();
+    // Перевірка камери
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .catch(err => {
+        scanText.textContent = 'Дозвольте доступ до камери';
+        console.error('Помилка камери:', err);
+      });
   </script>
 </body>
 </html>
-
