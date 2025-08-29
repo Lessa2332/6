@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AR Гра: Символи України</title>
+  <title>AR Вікторина: Символи України</title>
 
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -19,26 +19,52 @@
       height: 100%;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      touch-action: manipulation;
       background: #000;
+      touch-action: manipulation;
     }
 
-    #scanText {
+    #startScreen {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
       color: #FFD700;
-      font-size: 1.8em;
-      font-weight: bold;
-      text-shadow: 2px 2px 10px #000;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      width: 90%;
-      max-width: 400px;
-      z-index: 100;
+      z-index: 200;
+      font-size: 1.5em;
+      padding: 20px;
+    }
+
+    #startBtn {
+      margin-top: 30px;
+      background: #0055A4;
+      color: #FFD700;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    #startBtn:hover {
+      background: #003087;
+    }
+
+    #arContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
 
     #smartLessaBtn {
@@ -55,74 +81,163 @@
       text-decoration: none;
       z-index: 100;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div id="scanText">Натисни, щоб увімкнути камеру</div>
+  <!-- Екран початку -->
+  <div id="startScreen">
+    <h2>AR Вікторина: Україна</h2>
+    <p>Наведи камеру на маркер Hiro</p>
+    <p>Гра працює тільки на мобільному пристрої</p>
+    <button id="startBtn">Розпочати AR</button>
+  </div>
 
-  <a-scene
-    embedded
-    arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false; canvasResolution: 0.5;"
-    renderer="colorFormat: rgba; clearAlpha: 0;"
-    vr-mode-ui="enabled: false"
-    id="arScene"
-  >
-    <a-marker preset="hiro" id="marker">
-      <a-entity id="quiz-container" position="0 0 0" rotation="-90 0 0" scale="0.12 0.12 0.12">
-        <a-text
-          id="hint-text"
-          value="Чекаємо на маркер..."
-          font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-          width="30"
-          wrapCount="20"
-          align="center"
-          color="#FFD700"
-          position="0 3.5 0"
-        ></a-text>
-      </a-entity>
-    </a-marker>
-    <a-entity camera></a-entity>
-  </a-scene>
+  <!-- AR Сцена -->
+  <div id="arContainer">
+    <a-scene
+      embedded
+      arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+      renderer="colorFormat: rgba; clearAlpha: 0;"
+      vr-mode-ui="enabled: false"
+    >
+      <a-marker preset="hiro" id="marker">
+        <a-entity id="game-container" position="0 0 0" rotation="-90 0 0" scale="0.5 0.5 0.5">
+          <!-- Питання -->
+          <a-text
+            id="question"
+            value="Завантаження..."
+            font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            width="30"
+            wrapCount="20"
+            align="center"
+            color="#FFD700"
+            position="0 3 0"
+          ></a-text>
 
+          <!-- Відповіді -->
+          <a-entity id="ansA" class="answer" position="-1.5 1 0">
+            <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+          </a-entity>
+
+          <a-entity id="ansB" class="answer" position="0 1 0">
+            <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+          </a-entity>
+
+          <a-entity id="ansC" class="answer" position="1.5 1 0">
+            <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+          </a-entity>
+
+          <!-- Результат -->
+          <a-entity id="resultBox" visible="false">
+            <a-text
+              id="resultText"
+              value=""
+              font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+              width="35"
+              wrapCount="22"
+              align="center"
+              color="#FFD700"
+              position="0 2 0"
+            ></a-text>
+            <a-entity id="restartBtn" position="0 0.5 0">
+              <a-plane width="2.5" height="0.8" color="#FFD700" opacity="0.9"></a-plane>
+              <a-text value="Розпочати знову" width="20" align="center" color="black" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+            </a-entity>
+          </a-entity>
+        </a-entity>
+      </a-marker>
+
+      <!-- Камера з курсором -->
+      <a-entity camera cursor="rayOrigin: mouse"></a-entity>
+    </a-scene>
+  </div>
+
+  <!-- Посилання -->
   <a href="https://youtube.com/playlist?list=PL6UDFwT9TzFxsVdFiEBsQ9yFpcYRPOpfO&si=IyXv1SkdPyvhcW7Z"
      id="smartLessaBtn" target="_blank">@SmartLessa</a>
 
   <script>
-    const scanText = document.getElementById('scanText');
-    const arScene = document.querySelector('a-scene');
+    const startScreen = document.getElementById('startScreen');
+    const startBtn = document.getElementById('startBtn');
+    const marker = document.getElementById('marker');
+    const question = document.getElementById('question');
+    const ansA = document.getElementById('ansA');
+    const ansB = document.getElementById('ansB');
+    const ansC = document.getElementById('ansC');
+    const resultBox = document.getElementById('resultBox');
+    const resultText = document.getElementById('resultText');
+    const restartBtn = document.querySelector('#restartBtn');
 
-    // 🔥 Головне: дозволити камеру тільки після кліку користувача
-    function startAR() {
-      scanText.textContent = 'Завантаження AR...';
+    // Питання
+    const questions = [
+      { q: "Який державний символ України?", options: ["Лев", "Тризуб", "Орел"], correct: 1 },
+      { q: "Яка рослина символізує красу та любов?", options: ["Шипшина", "Калина", "Мак"], correct: 1 },
+      { q: "Який музичний інструмент грає кобзар?", options: ["Баян", "Сопілка", "Бандура"], correct: 2 },
+      { q: "Як називається традиційна вишивана сорочка?", options: ["Футболка", "Сорочка", "Вишиванка"], correct: 2 },
+      { q: "Що дарують на Великдень із візерунками?", options: ["Писанку", "Плюшку", "Картку"], correct: 0 }
+    ];
 
-      // AR.js автоматично використовує getUserMedia
-      // Але ми чекаємо на дозвіл через клік
+    let currentQ = 0;
+    let score = 0;
 
-      setTimeout(() => {
-        scanText.textContent = 'Наведи на маркер Hiro';
-      }, 1000);
+    function startGame() {
+      currentQ = 0;
+      score = 0;
+      resultBox.setAttribute('visible', false);
+      showQuestion();
     }
 
-    // 🔴 Камера запускається ТІЛЬКИ після кліку
-    scanText.addEventListener('click', function() {
-      scanText.style.display = 'none';
-      startAR();
+    function showQuestion() {
+      if (currentQ < questions.length) {
+        const q = questions[currentQ];
+        question.setAttribute('value', q.q);
+        ansA.querySelector('.ans-text').setAttribute('value', q.options[0]);
+        ansB.querySelector('.ans-text').setAttribute('value', q.options[1]);
+        ansC.querySelector('.ans-text').setAttribute('value', q.options[2]);
+
+        ansA.dataset.correct = (0 === q.correct);
+        ansB.dataset.correct = (1 === q.correct);
+        ansC.dataset.correct = (2 === q.correct);
+      } else {
+        const stars = score === 5 ? '🌟🌟🌟' : score >= 3 ? '🌟🌟' : '🌟';
+        resultText.setAttribute('value', `Ти відповів на ${score} з 5 питань!\n${stars}`);
+        resultBox.setAttribute('visible', true);
+      }
+    }
+
+    function handleAnswer(el) {
+      if (el.dataset.correct === 'true') score++;
+      currentQ++;
+      setTimeout(showQuestion, 600);
+    }
+
+    // Кліки
+    [ansA, ansB, ansC].forEach(el => {
+      el.addEventListener('click', () => handleAnswer(el));
     });
 
-    // Коли маркер знайдено
-    document.getElementById('marker').addEventListener('markerFound', () => {
-      console.log('Маркер знайдено!');
-      document.getElementById('hint-text').setAttribute('value', 'Вітаємо! Гра почалася!');
+    restartBtn.addEventListener('click', startGame);
+
+    // Події маркера
+    marker.addEventListener('markerFound', () => {
+      startGame(); // Кожен раз, як знайдено маркер — починаємо
+    });
+
+    // Запуск камери після кліку
+    startBtn.addEventListener('click', () => {
+      startScreen.style.display = 'none';
     });
 
     // Фікс висоти
-    function setHeight() {
+    window.addEventListener('resize', () => {
       document.body.style.height = window.innerHeight + 'px';
-    }
-    window.addEventListener('resize', setHeight);
-    setHeight();
+    });
+    document.body.style.height = window.innerHeight + 'px';
   </script>
 </body>
 </html>
-
