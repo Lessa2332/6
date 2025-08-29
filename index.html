@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -98,7 +99,7 @@
   <div id="arContainer">
     <a-scene
       embedded
-      arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+      arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false; sourceType: webcam; facingMode: environment;"
       renderer="colorFormat: rgba; clearAlpha: 0;"
       vr-mode-ui="enabled: false"
     >
@@ -119,17 +120,17 @@
           <!-- Відповіді -->
           <a-entity id="ansA" class="answer" position="-1.5 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
           </a-entity>
 
           <a-entity id="ansB" class="answer" position="0 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
           </a-entity>
 
           <a-entity id="ansC" class="answer" position="1.5 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
           </a-entity>
 
           <!-- Результат -->
@@ -146,19 +147,19 @@
             ></a-text>
             <a-entity id="restartBtn" position="0 0.5 0">
               <a-plane width="2.5" height="0.8" color="#FFD700" opacity="0.9"></a-plane>
-              <a-text value="Розпочати знову" width="20" align="center" color="black" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
+              <a-text value="Розпочати знову" width="20" align="center" color="black" position="0 -0.3 0.01"></a-text>
             </a-entity>
           </a-entity>
         </a-entity>
       </a-marker>
 
       <!-- Камера з курсором -->
-      <a-entity camera cursor="rayOrigin: mouse"></a-entity>
+      <a-camera cursor="rayOrigin: mouse"></a-camera>
     </a-scene>
   </div>
 
   <!-- Посилання -->
-  <a href="https://youtube.com/playlist?list=PL6UDFwT9TzFxsVdFiEBsQ9yFpcYRPOpfO&si=IyXv1SkdPyvhcW7Z"
+  <a href="https://youtube.com/playlist?list=PL6UDFwT9TzFxsVdFiEBsQ9yFpcYRPOpfO"
      id="smartLessaBtn" target="_blank">@SmartLessa</a>
 
   <script>
@@ -216,24 +217,20 @@
       setTimeout(showQuestion, 600);
     }
 
-    // Кліки
     [ansA, ansB, ansC].forEach(el => {
       el.addEventListener('click', () => handleAnswer(el));
     });
 
     restartBtn.addEventListener('click', startGame);
 
-    // Події маркера
     marker.addEventListener('markerFound', () => {
-      startGame(); // Кожен раз, як знайдено маркер — починаємо
+      startGame();
     });
 
-    // Запуск камери після кліку
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
     });
 
-    // Фікс висоти
     window.addEventListener('resize', () => {
       document.body.style.height = window.innerHeight + 'px';
     });
