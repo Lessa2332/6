@@ -3,23 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AR Маркер з PNG</title>
+  <title>AR з маркером та PNG</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-ar.js@4.0.1/aframe-ar.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
 </head>
-<body style="margin:0; overflow:hidden;">
+<body>
+
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     
     <!-- Маркер Hiro -->
     <a-marker preset="hiro">
-      <!-- PNG зображення -->
       <a-plane src="logo.png" height="1" width="1" position="0 0.5 0" material="transparent: true;"></a-plane>
     </a-marker>
+
+    <!-- Fallback PNG, щоб було видно без маркера -->
+    <a-plane src="logo.png" height="1" width="1" position="0 0.5 -2" material="transparent: true;"></a-plane>
 
     <!-- Камера -->
     <a-entity camera></a-entity>
   </a-scene>
+
 </body>
 </html>
-
-
