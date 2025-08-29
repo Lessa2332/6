@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AR Вікторина: Символи України</title>
 
-  <!-- A-Frame -->
+  <!-- A-Frame (без пробілів!) -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- AR.js -->
+  <!-- AR.js (без пробілів!) -->
   <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.5/aframe/build/aframe-ar.js"></script>
 
   <style>
@@ -99,12 +99,12 @@
   <div id="arContainer">
     <a-scene
       embedded
-      arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false; sourceType: webcam; facingMode: environment;"
+      arjs="trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
       renderer="colorFormat: rgba; clearAlpha: 0;"
       vr-mode-ui="enabled: false"
     >
       <a-marker preset="hiro" id="marker">
-        <a-entity id="game-container" position="0 0 0" rotation="-90 0 0" scale="0.5 0.5 0.5">
+        <a-entity id="game-container" position="0 0 0" rotation="-90 0 0" scale="0.1 0.1 0.1">
           <!-- Питання -->
           <a-text
             id="question"
@@ -120,17 +120,17 @@
           <!-- Відповіді -->
           <a-entity id="ansA" class="answer" position="-1.5 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
           </a-entity>
 
           <a-entity id="ansB" class="answer" position="0 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
           </a-entity>
 
           <a-entity id="ansC" class="answer" position="1.5 1 0">
             <a-plane width="3" height="0.8" color="#0055A4" opacity="0.9"></a-plane>
-            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01"></a-text>
+            <a-text class="ans-text" value="" width="20" align="center" color="white" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
           </a-entity>
 
           <!-- Результат -->
@@ -147,14 +147,14 @@
             ></a-text>
             <a-entity id="restartBtn" position="0 0.5 0">
               <a-plane width="2.5" height="0.8" color="#FFD700" opacity="0.9"></a-plane>
-              <a-text value="Розпочати знову" width="20" align="center" color="black" position="0 -0.3 0.01"></a-text>
+              <a-text value="Розпочати знову" width="20" align="center" color="black" position="0 -0.3 0.01" font="https://cdn.aframe.io/fonts/Roboto-msdf.json"></a-text>
             </a-entity>
           </a-entity>
         </a-entity>
       </a-marker>
 
-      <!-- Камера з курсором -->
-      <a-camera cursor="rayOrigin: mouse"></a-camera>
+      <!-- Камера -->
+      <a-entity camera></a-entity>
     </a-scene>
   </div>
 
@@ -174,7 +174,6 @@
     const resultText = document.getElementById('resultText');
     const restartBtn = document.querySelector('#restartBtn');
 
-    // Питання
     const questions = [
       { q: "Який державний символ України?", options: ["Лев", "Тризуб", "Орел"], correct: 1 },
       { q: "Яка рослина символізує красу та любов?", options: ["Шипшина", "Калина", "Мак"], correct: 1 },
@@ -224,13 +223,17 @@
     restartBtn.addEventListener('click', startGame);
 
     marker.addEventListener('markerFound', () => {
+      console.log("Маркер знайдено!");
       startGame();
     });
 
+    // Запуск AR після кліку
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
+      // AR.js запустить камеру автоматично
     });
 
+    // Фікс висоти
     window.addEventListener('resize', () => {
       document.body.style.height = window.innerHeight + 'px';
     });
